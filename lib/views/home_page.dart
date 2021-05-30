@@ -11,23 +11,18 @@ class HomePage extends StatelessWidget {
     return columns!
         .map(
           (e) => DragAndDropList(
-            header: Container(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
+            header: ListTile(
+              tileColor: Theme.of(context).primaryColor,
+              trailing: IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {},
               ),
-              child: Text(
+              title: Text(
                 e.columnName,
                 style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 22,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
               ),
             ),
             children: (e.tasks != null)
