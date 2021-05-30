@@ -11,18 +11,33 @@ class HomePage extends StatelessWidget {
     return columns!
         .map(
           (e) => DragAndDropList(
-            header: ListTile(
-              tileColor: Theme.of(context).primaryColor,
-              trailing: IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {},
+            header: Container(
+              padding: const EdgeInsets.only(left: 16.0),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
               ),
-              title: Text(
-                e.columnName,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    e.columnName,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.add_circle),
+                    iconSize: 18,
+                  )
+                ],
               ),
             ),
             children: (e.tasks != null)
