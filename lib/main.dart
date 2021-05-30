@@ -1,4 +1,3 @@
-import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -12,6 +11,8 @@ import 'views/home_page.dart';
 // ignore: avoid_void_async
 void main() async {
   await Hive.initFlutter();
+  Hive.registerAdapter(ColumnModelAdapter());
+  Hive.registerAdapter(TaskModelAdapter());
   await Hive.openBox<ColumnModel>(boxName);
   runApp(MyApp());
 }
