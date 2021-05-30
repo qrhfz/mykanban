@@ -7,7 +7,7 @@ import 'package:mykanban/models/column_model.dart';
 import '../string_const.dart';
 
 class HiveController extends GetxController {
-  RxList<ColumnModel> columns = RxList<ColumnModel>();
+  List<ColumnModel> columns = [];
   final box = Hive.box<ColumnModel>(boxName);
   @override
   void onInit() async {
