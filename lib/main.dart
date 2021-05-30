@@ -6,12 +6,13 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mykanban/models/column_model.dart';
 import 'package:mykanban/models/task_model.dart';
 
+import 'string_const.dart';
 import 'views/home_page.dart';
 
 // ignore: avoid_void_async
 void main() async {
   await Hive.initFlutter();
-  await Hive.openBox('test');
+  await Hive.openBox<ColumnModel>(boxName);
   runApp(MyApp());
 }
 
