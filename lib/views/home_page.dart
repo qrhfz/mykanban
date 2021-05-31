@@ -113,6 +113,8 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  final columnNameTxtCtrl = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,6 +131,25 @@ class HomePage extends StatelessWidget {
             onListReorder: controller.onListReorder,
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.defaultDialog(
+            content: TextField(
+              controller: columnNameTxtCtrl,
+              decoration: const InputDecoration(labelText: 'Column Name'),
+            ),
+            confirm: ElevatedButton.icon(
+              onPressed: () {
+                controller.addColumn(columnNameTxtCtrl.text);
+                Get.back();
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Add'),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

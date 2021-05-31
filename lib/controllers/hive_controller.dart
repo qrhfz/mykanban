@@ -20,10 +20,9 @@ class HiveController extends GetxController {
   Future fetchKanban() async {
     columns = RxList<ColumnModel>.empty();
     if (box.isEmpty) {
-      await addColumn('ready');
-      await addColumn('on progress');
-      await addColumn('done');
-      await fetchKanban();
+      addColumn('ready');
+      addColumn('on progress');
+      addColumn('done');
     } else {
       // box.deleteAt(0);
       // box.deleteAt(0);
