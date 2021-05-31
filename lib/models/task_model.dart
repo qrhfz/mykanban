@@ -5,10 +5,10 @@ part 'task_model.g.dart';
 @HiveType(typeId: 2)
 class TaskModel {
   @HiveField(0)
-  final String taskName;
+  String taskName;
 
   @HiveField(1)
-  final String? description;
+  String? description;
 
   TaskModel({required this.taskName, this.description});
 }

@@ -11,7 +11,7 @@ class HiveController extends GetxController {
   RxList<ColumnModel> columns = RxList<ColumnModel>.empty();
   final box = Hive.box<ColumnModel>(boxName);
   @override
-  void onInit() async {
+  Future onInit() async {
     // TODO: implement onInit
     super.onInit();
     await fetchKanban();
@@ -19,7 +19,6 @@ class HiveController extends GetxController {
 
   Future fetchKanban() async {
     columns = RxList<ColumnModel>.empty();
-    print('fetch : ${columns.isEmpty}');
     if (box.isEmpty) {
       await addColumn('ready');
       await addColumn('on progress');
@@ -52,17 +51,15 @@ class HiveController extends GetxController {
     // _contents[newListIndex].children.insert(newItemIndex, movedItem);
     final movedItem = columns[oldListIndex].tasks.removeAt(oldItemIndex);
     columns[newListIndex].tasks.insert(newItemIndex, movedItem);
-
+    columns.refresh();
     syncHive();
-    update();
   }
 
-  void onListReorder(int oldListIndex, int newListIndex) {
+  Future onListReorder(int oldListIndex, int newListIndex) async {
     final movedList = columns.removeAt(oldListIndex);
     columns.insert(newListIndex, movedList);
 
-    syncHive();
-    fetchKanban();
+    await syncHive();
   }
 
   Future syncHive() async {
@@ -70,21 +67,56 @@ class HiveController extends GetxController {
       await box.put(i, columns[i]);
       //print('res : ${box.getAt(i)!.tasks[0].taskName}');
     }
+    await fetchKanban();
   }
 
   Future addColumn(String columnName) async {
     columns.add(ColumnModel(columnName, tasks: RxList.empty()));
+
     await syncHive();
   }
 
   Future<void> addTask(String columnName, String taskName) async {
     columns.forEach((e) {
       if (e.columnName == columnName) {
-        print('add task : ${e.columnName}');
+        // print('add task : ${e.columnName}');
 
         e.tasks.add(TaskModel(taskName: taskName));
       }
     });
+
+    columns.refresh();
+    await syncHive();
+  }
+
+  Future<void> updateTask(
+      String columnName, String oldTaskName, String newTaskName) async {
+    columns.forEach((column) {
+      if (column.columnName == columnName) {
+        // print('add task : ${e.columnName}');
+
+        column.tasks.forEach((task) {
+          if (task.taskName == oldTaskName) {
+            task.taskName = newTaskName;
+          }
+        });
+      }
+    });
+
+    columns.refresh();
+    await syncHive();
+  }
+
+  Future<void> deleteTask(String columnName, String taskName) async {
+    columns.forEach((column) {
+      if (column.columnName == columnName) {
+        // print('add task : ${e.columnName}');
+
+        column.tasks.removeWhere((e) => e.taskName == taskName);
+      }
+    });
+
+    columns.refresh();
     await syncHive();
   }
 }

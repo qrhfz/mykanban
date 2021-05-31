@@ -18,24 +18,53 @@ class HomePage extends StatelessWidget {
         .toList();
   }
 
-  List<DragAndDropItem> buildItems(ColumnModel e) {
-    return e.tasks
-        .map(
-          (e) => DragAndDropItem(
-              child: Card(
-            shape: const RoundedRectangleBorder(),
-            margin: const EdgeInsets.only(
-              bottom: 0.5,
+  List<DragAndDropItem> buildItems(ColumnModel column) {
+    return column.tasks.map((task) {
+      final taskName = task.taskName;
+      return DragAndDropItem(
+          child: Card(
+        shape: const RoundedRectangleBorder(),
+        margin: const EdgeInsets.only(
+          bottom: 0.5,
+        ),
+        child: GestureDetector(
+          onTap: () => Get.defaultDialog(
+            title: 'Edit $taskName',
+            content: TextField(
+              decoration: InputDecoration(
+                  border: const UnderlineInputBorder(), labelText: taskName),
+              controller: taskNameCtrl,
             ),
-            child: ListTile(title: Text(e.taskName)),
-          )),
-        )
-        .toList();
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  controller.updateTask(
+                      column.columnName, task.taskName, taskNameCtrl.text);
+                  Get.back();
+                },
+                child: const Text('Save'),
+              ),
+              TextButton(
+                onPressed: () {
+                  controller.deleteTask(column.columnName, task.taskName);
+                  Get.back();
+                },
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+          child: ListTile(title: Text(task.taskName)),
+        ),
+      ));
+    }).toList();
   }
 
   final taskNameCtrl = TextEditingController();
 
-  Container buildHeader(BuildContext context, ColumnModel column) {
+  Container buildHeader(BuildContext context, ColumnModel e) {
     return Container(
       padding: const EdgeInsets.only(left: 16.0),
       width: double.infinity,
@@ -50,14 +79,14 @@ class HomePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            column.columnName,
+            e.columnName,
             style: const TextStyle(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           IconButton(
             onPressed: () => Get.defaultDialog(
-                title: column.columnName,
+                title: e.columnName,
                 content: Column(
                   children: [
                     TextField(
@@ -65,8 +94,7 @@ class HomePage extends StatelessWidget {
                     ),
                     ElevatedButton.icon(
                         onPressed: () {
-                          controller.addTask(
-                              column.columnName, taskNameCtrl.text);
+                          controller.addTask(e.columnName, taskNameCtrl.text);
                           Get.back();
                         },
                         icon: const Icon(Icons.add),
