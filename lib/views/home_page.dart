@@ -14,9 +14,34 @@ class HomePage extends StatelessWidget {
     return columns!
         .map(
           (e) => DragAndDropList(
-            header: buildHeader(context, e),
-            children: buildItems(e),
-          ),
+              header: buildHeader(context, e),
+              footer: Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                child: Center(
+                  child: IconButton(
+                    onPressed: () => Get.defaultDialog(
+                        title: e.columnName,
+                        content: Column(
+                          children: [
+                            TextField(
+                              controller: taskNameCtrl,
+                            ),
+                            ElevatedButton.icon(
+                                onPressed: () {
+                                  controller.addTask(
+                                      e.columnName, taskNameCtrl.text);
+                                  Get.back();
+                                },
+                                icon: const Icon(Icons.add),
+                                label: const Text('add'))
+                          ],
+                        )),
+                    icon: const Icon(Icons.add_circle),
+                  ),
+                ),
+              ),
+              children: buildItems(e),
+              contentsWhenEmpty: Container()),
         )
         .toList();
   }
@@ -25,31 +50,14 @@ class HomePage extends StatelessWidget {
     return Card(
       child: ListTile(
         tileColor: Theme.of(context).primaryColor,
-        title: Text(
-          e.columnName,
-          style: const TextStyle(
-              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.left,
-        ),
-        trailing: IconButton(
-          onPressed: () => Get.defaultDialog(
-              title: e.columnName,
-              content: Column(
-                children: [
-                  TextField(
-                    controller: taskNameCtrl,
-                  ),
-                  ElevatedButton.icon(
-                      onPressed: () {
-                        controller.addTask(e.columnName, taskNameCtrl.text);
-                        Get.back();
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text('add'))
-                ],
-              )),
-          icon: const Icon(Icons.add_circle),
-          iconSize: 18,
+        title: GestureDetector(
+          onDoubleTap: () => Get.defaultDialog(),
+          child: Text(
+            e.columnName,
+            style: const TextStyle(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.left,
+          ),
         ),
       ),
     );
@@ -60,7 +68,7 @@ class HomePage extends StatelessWidget {
       final taskName = task.taskName;
       return DragAndDropItem(
           child: GestureDetector(
-        onTap: () {
+        onDoubleTap: () {
           taskNameCtrl.text = taskName;
           Get.defaultDialog(
             title: 'Edit $taskName',
@@ -111,6 +119,26 @@ class HomePage extends StatelessWidget {
             children: setContents(context, controller.columns),
             onItemReorder: controller.onItemReorder,
             onListReorder: controller.onListReorder,
+            listDragHandle: DragHandle(
+              verticalAlignment: DragHandleVerticalAlignment.top,
+              child: Container(
+                  margin: const EdgeInsets.only(right: 16.0, top: 20),
+                  child: const Icon(Icons.drag_handle)),
+            ),
+            itemDragHandle: DragHandle(
+              // verticalAlignment: DragHandleVerticalAlignment.center,
+              child: Container(
+                margin: const EdgeInsets.only(right: 16.0),
+                child: const Icon(Icons.drag_handle),
+              ),
+            ),
+            contentsWhenEmpty:
+                const Text('Column is empty, click + to add column'),
+            // lastItemTargetHeight: 5,
+            itemGhost: const Card(
+                child: ListTile(
+              title: Text('Drag here'),
+            )),
           ),
         ),
       ),

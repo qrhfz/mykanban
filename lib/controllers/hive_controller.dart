@@ -1,5 +1,5 @@
-import 'dart:convert';
-import 'dart:math';
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:mykanban/models/column_model.dart';
@@ -12,29 +12,22 @@ class HiveController extends GetxController {
   final box = Hive.box<ColumnModel>(boxName);
   @override
   Future onInit() async {
-    // TODO: implement onInit
     super.onInit();
-    await fetchKanban();
+    fetchKanban();
   }
 
-  Future fetchKanban() async {
-    columns = RxList<ColumnModel>.empty();
-    if (box.isEmpty) {
-      addColumn('ready');
-      addColumn('on progress');
-      addColumn('done');
-    } else {
-      // box.deleteAt(0);
-      // box.deleteAt(0);
-      // box.deleteAt(0);
-      var i = 0;
+  void fetchKanban() {
+    columns.removeWhere((element) => true);
 
-      while (i < box.length) {
-        // print('$i = ${box.getAt(i)!.columnName}');
-        columns.add(box.getAt(i)!);
-        i++;
-      }
+    var i = 0;
+
+    while (i < box.length) {
+      // print('$i = ${box.getAt(i)!.columnName}');
+      columns.add(box.getAt(i)!);
+      i++;
     }
+
+    columns.refresh();
   }
 
   @override
@@ -46,19 +39,29 @@ class HiveController extends GetxController {
 
   void onItemReorder(
       int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-    // var movedItem = _contents[oldListIndex].children.removeAt(oldItemIndex);
-    // _contents[newListIndex].children.insert(newItemIndex, movedItem);
-    final movedItem = columns[oldListIndex].tasks.removeAt(oldItemIndex);
-    columns[newListIndex].tasks.insert(newItemIndex, movedItem);
+    log('oi: $oldItemIndex, ol: $oldListIndex, ni: $newItemIndex, nl: $newListIndex');
+
+    final oldColumn = columns[oldListIndex];
+    final newColumn = columns[newListIndex];
+
+    if (oldItemIndex < oldColumn.tasks.length) {
+      final movedTask = oldColumn.tasks.removeAt(oldItemIndex);
+      newColumn.tasks.insert(newItemIndex, movedTask);
+    } else {
+      Get.snackbar('Error', 'Sorry');
+      fetchKanban();
+    }
+
     columns.refresh();
     syncHive();
   }
 
-  Future onListReorder(int oldListIndex, int newListIndex) async {
+  void onListReorder(int oldListIndex, int newListIndex) {
     final movedList = columns.removeAt(oldListIndex);
     columns.insert(newListIndex, movedList);
 
-    await syncHive();
+    syncHive();
+    // columns.refresh();
   }
 
   Future syncHive() async {
@@ -66,7 +69,7 @@ class HiveController extends GetxController {
       await box.put(i, columns[i]);
       //print('res : ${box.getAt(i)!.tasks[0].taskName}');
     }
-    await fetchKanban();
+    fetchKanban();
   }
 
   Future addColumn(String columnName) async {
@@ -76,7 +79,7 @@ class HiveController extends GetxController {
   }
 
   Future<void> addTask(String columnName, String taskName) async {
-    for (var col in columns) {
+    for (final col in columns) {
       if (col.columnName == columnName) {
         // print('add task : ${e.columnName}');
 
@@ -90,11 +93,11 @@ class HiveController extends GetxController {
 
   Future<void> updateTask(
       String columnName, String oldTaskName, String newTaskName) async {
-    for (var col in columns) {
+    for (final col in columns) {
       if (col.columnName == columnName) {
         // print('add task : ${e.columnName}');
 
-        for (var task in col.tasks) {
+        for (final task in col.tasks) {
           if (task.taskName == oldTaskName) {
             task.taskName = newTaskName;
           }
@@ -107,7 +110,7 @@ class HiveController extends GetxController {
   }
 
   Future<void> deleteTask(String columnName, String taskName) async {
-    for (var col in columns) {
+    for (final col in columns) {
       if (col.columnName == columnName) {
         // print('add task : ${e.columnName}');
 
@@ -120,8 +123,8 @@ class HiveController extends GetxController {
   }
 }
 
-String getRandString(int len) {
-  final random = Random.secure();
-  final values = List<int>.generate(len, (i) => random.nextInt(255));
-  return base64UrlEncode(values);
-}
+// String getRandString(int len) {
+//   final random = Random.secure();
+//   final values = List<int>.generate(len, (i) => random.nextInt(255));
+//   return base64UrlEncode(values);
+// }
