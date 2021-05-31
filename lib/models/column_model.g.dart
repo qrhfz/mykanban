@@ -18,7 +18,7 @@ class ColumnModelAdapter extends TypeAdapter<ColumnModel> {
     };
     return ColumnModel(
       fields[0] as String,
-      tasks: (fields[1] as List?)?.cast<TaskModel>(),
+      tasks: (fields[1] as List).cast<TaskModel>(),
     );
   }
 

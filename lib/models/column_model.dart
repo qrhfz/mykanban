@@ -8,10 +8,10 @@ class ColumnModel {
   @HiveField(0)
   final String columnName;
   @HiveField(1)
-  final List<TaskModel>? tasks;
+  List<TaskModel> tasks;
 
   ColumnModel(
     this.columnName, {
-    this.tasks,
+    required this.tasks,
   });
 }

@@ -3,11 +3,12 @@ import 'dart:math';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:mykanban/models/column_model.dart';
+import 'package:mykanban/models/task_model.dart';
 
 import '../string_const.dart';
 
 class HiveController extends GetxController {
-  RxList<ColumnModel> columns = RxList<ColumnModel>();
+  RxList<ColumnModel> columns = RxList<ColumnModel>.empty();
   final box = Hive.box<ColumnModel>(boxName);
   @override
   void onInit() async {
@@ -17,7 +18,8 @@ class HiveController extends GetxController {
   }
 
   Future fetchKanban() async {
-    columns = RxList<ColumnModel>();
+    columns = RxList<ColumnModel>.empty();
+    print('fetch : ${columns.isEmpty}');
     if (box.isEmpty) {
       await addColumn('ready');
       await addColumn('on progress');
@@ -30,7 +32,7 @@ class HiveController extends GetxController {
       var i = 0;
 
       while (i < box.length) {
-        // print('$i = ${box.getAt(i)!.columnName}');
+        print('$i = ${box.getAt(i)!.columnName}');
         columns.add(box.getAt(i)!);
         i++;
       }
@@ -48,23 +50,42 @@ class HiveController extends GetxController {
       int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
     // var movedItem = _contents[oldListIndex].children.removeAt(oldItemIndex);
     // _contents[newListIndex].children.insert(newItemIndex, movedItem);
-    final movedItem = columns[oldListIndex].tasks!.removeAt(oldItemIndex);
-    columns[newListIndex].tasks!.insert(newItemIndex, movedItem);
+    final movedItem = columns[oldListIndex].tasks.removeAt(oldItemIndex);
+    columns[newListIndex].tasks.insert(newItemIndex, movedItem);
+
+    syncHive();
+    update();
   }
 
   void onListReorder(int oldListIndex, int newListIndex) {
     final movedList = columns.removeAt(oldListIndex);
     columns.insert(newListIndex, movedList);
 
-    for (var i = 0; i < box.length; i++) {
-      // print('$i <- ${columns[i].columnName}');
-      box.putAt(i, columns[i]);
-      // print('res : ${box.getAt(i)!.columnName}');
+    syncHive();
+    fetchKanban();
+  }
+
+  Future syncHive() async {
+    for (var i = 0; i < columns.length; i++) {
+      await box.put(i, columns[i]);
+      //print('res : ${box.getAt(i)!.tasks[0].taskName}');
     }
   }
 
   Future addColumn(String columnName) async {
-    await box.put(columnName, ColumnModel(columnName));
+    columns.add(ColumnModel(columnName, tasks: RxList.empty()));
+    await syncHive();
+  }
+
+  Future<void> addTask(String columnName, String taskName) async {
+    columns.forEach((e) {
+      if (e.columnName == columnName) {
+        print('add task : ${e.columnName}');
+
+        e.tasks.add(TaskModel(taskName: taskName));
+      }
+    });
+    await syncHive();
   }
 }
 
