@@ -6,6 +6,9 @@ import 'package:mykanban/models/column_model.dart';
 
 class HomePage extends StatelessWidget {
   final HiveController controller = Get.put(HiveController());
+  final columnNameTxtCtrl = TextEditingController();
+  final taskNameCtrl = TextEditingController();
+
   List<DragAndDropList> setContents(
       BuildContext context, List<ColumnModel>? columns) {
     return columns!
@@ -18,102 +21,81 @@ class HomePage extends StatelessWidget {
         .toList();
   }
 
-  List<DragAndDropItem> buildItems(ColumnModel column) {
-    return column.tasks.map((task) {
-      final taskName = task.taskName;
-      return DragAndDropItem(
-          child: Card(
-        shape: const RoundedRectangleBorder(),
-        margin: const EdgeInsets.only(
-          bottom: 0.5,
+  Widget buildHeader(BuildContext context, ColumnModel e) {
+    return Card(
+      child: ListTile(
+        tileColor: Theme.of(context).primaryColor,
+        title: Text(
+          e.columnName,
+          style: const TextStyle(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.left,
         ),
-        child: GestureDetector(
-          onTap: () {
-            taskNameCtrl.text = taskName;
-            Get.defaultDialog(
-              title: 'Edit $taskName',
-              content: TextField(
-                decoration: const InputDecoration(
-                    border: UnderlineInputBorder(), labelText: 'Task Name'),
-                // hintText: taskName),
-                controller: taskNameCtrl,
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    controller.updateTask(
-                        column.columnName, taskName, taskNameCtrl.text);
-                    Get.back();
-                  },
-                  child: const Text('Save'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    controller.deleteTask(column.columnName, taskName);
-                    Get.back();
-                  },
-                  child: const Text(
-                    'Delete',
-                    style: TextStyle(color: Colors.red),
+        trailing: IconButton(
+          onPressed: () => Get.defaultDialog(
+              title: e.columnName,
+              content: Column(
+                children: [
+                  TextField(
+                    controller: taskNameCtrl,
                   ),
-                ),
-              ],
-            );
-          },
-          child: ListTile(title: Text(task.taskName)),
+                  ElevatedButton.icon(
+                      onPressed: () {
+                        controller.addTask(e.columnName, taskNameCtrl.text);
+                        Get.back();
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('add'))
+                ],
+              )),
+          icon: const Icon(Icons.add_circle),
+          iconSize: 18,
         ),
-      ));
-    }).toList();
-  }
-
-  final taskNameCtrl = TextEditingController();
-
-  Container buildHeader(BuildContext context, ColumnModel e) {
-    return Container(
-      padding: const EdgeInsets.only(left: 16.0),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            e.columnName,
-            style: const TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-          IconButton(
-            onPressed: () => Get.defaultDialog(
-                title: e.columnName,
-                content: Column(
-                  children: [
-                    TextField(
-                      controller: taskNameCtrl,
-                    ),
-                    ElevatedButton.icon(
-                        onPressed: () {
-                          controller.addTask(e.columnName, taskNameCtrl.text);
-                          Get.back();
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text('add'))
-                  ],
-                )),
-            icon: const Icon(Icons.add_circle),
-            iconSize: 18,
-          )
-        ],
       ),
     );
   }
 
-  final columnNameTxtCtrl = TextEditingController();
+  List<DragAndDropItem> buildItems(ColumnModel column) {
+    return column.tasks.map((task) {
+      final taskName = task.taskName;
+      return DragAndDropItem(
+          child: GestureDetector(
+        onTap: () {
+          taskNameCtrl.text = taskName;
+          Get.defaultDialog(
+            title: 'Edit $taskName',
+            content: TextField(
+              decoration: const InputDecoration(
+                  border: UnderlineInputBorder(), labelText: 'Task Name'),
+              // hintText: taskName),
+              controller: taskNameCtrl,
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  controller.updateTask(
+                      column.columnName, taskName, taskNameCtrl.text);
+                  Get.back();
+                },
+                child: const Text('Save'),
+              ),
+              TextButton(
+                onPressed: () {
+                  controller.deleteTask(column.columnName, taskName);
+                  Get.back();
+                },
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          );
+        },
+        child: Card(child: ListTile(title: Text(task.taskName))),
+      ));
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
