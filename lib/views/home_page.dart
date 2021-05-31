@@ -28,34 +28,38 @@ class HomePage extends StatelessWidget {
           bottom: 0.5,
         ),
         child: GestureDetector(
-          onTap: () => Get.defaultDialog(
-            title: 'Edit $taskName',
-            content: TextField(
-              decoration: InputDecoration(
-                  border: const UnderlineInputBorder(), labelText: taskName),
-              controller: taskNameCtrl,
-            ),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  controller.updateTask(
-                      column.columnName, task.taskName, taskNameCtrl.text);
-                  Get.back();
-                },
-                child: const Text('Save'),
+          onTap: () {
+            taskNameCtrl.text = taskName;
+            Get.defaultDialog(
+              title: 'Edit $taskName',
+              content: TextField(
+                decoration: const InputDecoration(
+                    border: UnderlineInputBorder(), labelText: 'Task Name'),
+                // hintText: taskName),
+                controller: taskNameCtrl,
               ),
-              TextButton(
-                onPressed: () {
-                  controller.deleteTask(column.columnName, task.taskName);
-                  Get.back();
-                },
-                child: const Text(
-                  'Delete',
-                  style: TextStyle(color: Colors.red),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    controller.updateTask(
+                        column.columnName, taskName, taskNameCtrl.text);
+                    Get.back();
+                  },
+                  child: const Text('Save'),
                 ),
-              ),
-            ],
-          ),
+                TextButton(
+                  onPressed: () {
+                    controller.deleteTask(column.columnName, taskName);
+                    Get.back();
+                  },
+                  child: const Text(
+                    'Delete',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            );
+          },
           child: ListTile(title: Text(task.taskName)),
         ),
       ));
