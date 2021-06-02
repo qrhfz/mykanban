@@ -161,6 +161,7 @@ class HomePage extends StatelessWidget {
       return DragAndDropItem(
           child: GestureDetector(
         onDoubleTap: () {
+          var index = column.tasks.indexOf(task);
           taskNameCtrl.text = taskName;
           taskDescCtrl.text = taskDesc ?? '';
           showModalBottomSheet(
@@ -171,6 +172,7 @@ class HomePage extends StatelessWidget {
               taskDescCtrl: taskDescCtrl,
               controller: controller,
               col: column,
+              index: index,
             ),
           );
         },

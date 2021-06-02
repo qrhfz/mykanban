@@ -136,12 +136,12 @@ class HiveController extends GetxController {
     await syncHive();
   }
 
-  Future<void> deleteTask(String columnName, String taskName) async {
+  Future<void> deleteTask(String columnName, int index) async {
     for (final col in columns) {
       if (col.columnName == columnName) {
         // print('add task : ${e.columnName}');
 
-        col.tasks.removeWhere((task) => task.taskName == taskName);
+        col.tasks.removeAt(index);
       }
     }
 

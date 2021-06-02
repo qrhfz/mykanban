@@ -12,12 +12,14 @@ class EditTaskSheet extends StatelessWidget {
     required this.controller,
     required this.col,
     required this.taskDescCtrl,
+    required this.index,
   }) : super(key: key);
 
   final TextEditingController taskNameCtrl;
   final TextEditingController taskDescCtrl;
   final HiveController controller;
   final ColumnModel col;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -65,10 +67,7 @@ class EditTaskSheet extends StatelessWidget {
                 ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(primary: Colors.red),
                     onPressed: () {
-                      controller.deleteTask(
-                        col.columnName,
-                        taskNameCtrl.text,
-                      );
+                      controller.deleteTask(col.columnName, index);
                       Get.back();
                     },
                     icon: const Icon(Icons.delete),
