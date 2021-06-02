@@ -116,14 +116,17 @@ class HiveController extends GetxController {
   }
 
   Future<void> updateTask(
-      String columnName, String oldTaskName, String newTaskName) async {
+      {required String columnName,
+      required String oldTaskName,
+      required String newTaskName,
+      required String newDesc}) async {
+    log('update task old : $oldTaskName, new: $newTaskName');
     for (final col in columns) {
       if (col.columnName == columnName) {
-        // print('add task : ${e.columnName}');
-
         for (final task in col.tasks) {
           if (task.taskName == oldTaskName) {
             task.taskName = newTaskName;
+            task.description = newDesc;
           }
         }
       }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mykanban/controllers/hive_controller.dart';
@@ -19,6 +21,8 @@ class EditTaskSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final oldName = taskNameCtrl.text;
+    log(oldName);
     return Padding(
       padding: EdgeInsets.only(
           top: 16,
@@ -48,13 +52,16 @@ class EditTaskSheet extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ElevatedButton.icon(
-                    onPressed: () {
-                      controller.addTask(
-                          col.columnName, taskNameCtrl.text, taskDescCtrl.text);
+                    onPressed: () async {
+                      await controller.updateTask(
+                          oldTaskName: oldName,
+                          newTaskName: taskNameCtrl.text,
+                          columnName: col.columnName,
+                          newDesc: taskDescCtrl.text);
                       Get.back();
                     },
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add')),
+                    icon: const Icon(Icons.update),
+                    label: const Text('Update')),
                 ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(primary: Colors.red),
                     onPressed: () {
