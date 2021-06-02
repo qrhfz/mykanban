@@ -164,13 +164,15 @@ class HomePage extends StatelessWidget {
           taskNameCtrl.text = taskName;
           taskDescCtrl.text = taskDesc ?? '';
           showModalBottomSheet(
-              isScrollControlled: true,
-              context: context,
-              builder: (context) => EditTaskSheet(
-                  taskNameCtrl: taskNameCtrl,
-                  controller: controller,
-                  col: column,
-                  taskDescCtrl: taskDescCtrl));
+            isScrollControlled: true,
+            context: context,
+            builder: (context) => EditTaskSheet(
+              taskNameCtrl: taskNameCtrl,
+              taskDescCtrl: taskDescCtrl,
+              controller: controller,
+              col: column,
+            ),
+          );
         },
         child: Card(child: ListTile(title: Text(task.taskName))),
       ));

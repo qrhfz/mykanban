@@ -20,48 +20,52 @@ class AddTaskButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () => showModalBottomSheet(
-          isScrollControlled: true,
-          context: context,
-          builder: (context) {
-            return Padding(
-              padding: EdgeInsets.only(
-                  top: 16,
-                  left: 16,
-                  right: 16,
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: taskNameCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
+      onPressed: () {
+        taskNameCtrl.text = '';
+        taskDescCtrl.text = '';
+        showModalBottomSheet(
+            isScrollControlled: true,
+            context: context,
+            builder: (context) {
+              return Padding(
+                padding: EdgeInsets.only(
+                    top: 16,
+                    left: 16,
+                    right: 16,
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: taskNameCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Name',
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: taskDescCtrl,
-                    minLines: 3,
-                    maxLines: 5,
-                    decoration: const InputDecoration(
-                      labelText: 'Description',
+                    TextField(
+                      controller: taskDescCtrl,
+                      minLines: 3,
+                      maxLines: 5,
+                      decoration: const InputDecoration(
+                        labelText: 'Description',
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: ElevatedButton.icon(
-                        onPressed: () {
-                          controller.addTask(col.columnName, taskNameCtrl.text,
-                              taskDescCtrl.text);
-                          Get.back();
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text('add')),
-                  )
-                ],
-              ),
-            );
-          }),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: ElevatedButton.icon(
+                          onPressed: () {
+                            controller.addTask(col.columnName,
+                                taskNameCtrl.text, taskDescCtrl.text);
+                            Get.back();
+                          },
+                          icon: const Icon(Icons.add),
+                          label: const Text('add')),
+                    )
+                  ],
+                ),
+              );
+            });
+      },
       icon: const Icon(Icons.add_circle),
     );
   }
