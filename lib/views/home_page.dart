@@ -8,39 +8,25 @@ class HomePage extends StatelessWidget {
   final HiveController controller = Get.put(HiveController());
   final columnNameTxtCtrl = TextEditingController();
   final taskNameCtrl = TextEditingController();
+  final taskDescCtrl = TextEditingController();
 
   List<DragAndDropList> setContents(
       BuildContext context, List<ColumnModel>? columns) {
     return columns!
         .map(
-          (e) => DragAndDropList(
-              header: buildHeader(context, e),
+          (col) => DragAndDropList(
+              header: buildHeader(context, col),
               footer: Container(
                 margin: const EdgeInsets.only(bottom: 24),
                 child: Center(
-                  child: IconButton(
-                    onPressed: () => Get.defaultDialog(
-                        title: e.columnName,
-                        content: Column(
-                          children: [
-                            TextField(
-                              controller: taskNameCtrl,
-                            ),
-                            ElevatedButton.icon(
-                                onPressed: () {
-                                  controller.addTask(
-                                      e.columnName, taskNameCtrl.text);
-                                  Get.back();
-                                },
-                                icon: const Icon(Icons.add),
-                                label: const Text('add'))
-                          ],
-                        )),
-                    icon: const Icon(Icons.add_circle),
-                  ),
+                  child: AddTaskButton(
+                      col: col,
+                      taskNameCtrl: taskNameCtrl,
+                      taskDescCtrl: taskDescCtrl,
+                      controller: controller),
                 ),
               ),
-              children: buildItems(e),
+              children: buildItems(col),
               contentsWhenEmpty: Container()),
         )
         .toList();
@@ -108,6 +94,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // resizeToAvoidBottomInset: false,ta
       appBar: AppBar(
         title: const Text('My Kanban'),
         centerTitle: true,
@@ -161,6 +148,60 @@ class HomePage extends StatelessWidget {
         },
         child: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+class AddTaskButton extends StatelessWidget {
+  const AddTaskButton({
+    Key? key,
+    required this.taskNameCtrl,
+    required this.controller,
+    required this.col,
+    required this.taskDescCtrl,
+  }) : super(key: key);
+
+  final TextEditingController taskNameCtrl;
+  final TextEditingController taskDescCtrl;
+  final HiveController controller;
+  final ColumnModel col;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () => showModalBottomSheet(
+          context: context,
+          builder: (context) {
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: taskNameCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Name',
+                    ),
+                  ),
+                  TextField(
+                    controller: taskDescCtrl,
+                    minLines: 3,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      labelText: 'Description',
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                      onPressed: () {
+                        controller.addTask(col.columnName, taskNameCtrl.text);
+                        Get.back();
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('add'))
+                ],
+              ),
+            );
+          }),
+      icon: const Icon(Icons.add_circle),
     );
   }
 }
