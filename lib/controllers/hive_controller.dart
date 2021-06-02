@@ -78,12 +78,36 @@ class HiveController extends GetxController {
     await syncHive();
   }
 
-  Future<void> addTask(String columnName, String taskName) async {
+  void deleteColumn(String columnName) {
+    var i = 0;
+    log('del col : $columnName');
+    columns.removeWhere((col) {
+      log('${col.columnName} == $columnName => ${col.columnName == columnName} ');
+      if (col.columnName == columnName) box.deleteAt(i);
+      i++;
+      return col.columnName == columnName;
+    });
+
+    for (final col in columns) {
+      log('col name : ${col.columnName}');
+    }
+    columns.refresh();
+    // syncHive();
+  }
+
+  Future updateColumn(String columnName, String newColumnName) async {
+    columns.firstWhere((col) => col.columnName == columnName).columnName =
+        newColumnName;
+
+    await syncHive();
+  }
+
+  Future<void> addTask(String columnName, String taskName, String desc) async {
     for (final col in columns) {
       if (col.columnName == columnName) {
         // print('add task : ${e.columnName}');
 
-        col.tasks.add(TaskModel(taskName: taskName));
+        col.tasks.add(TaskModel(taskName: taskName, description: desc));
       }
     }
 

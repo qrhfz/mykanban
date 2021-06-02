@@ -6,7 +6,7 @@ part 'column_model.g.dart';
 @HiveType(typeId: 1)
 class ColumnModel {
   @HiveField(0)
-  final String columnName;
+  String columnName;
   @HiveField(1)
   List<TaskModel> tasks;
 

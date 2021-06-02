@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mykanban/controllers/hive_controller.dart';
 import 'package:mykanban/models/column_model.dart';
+import 'package:mykanban/views/widgets/edit_task_sheet.dart';
 
 import 'widgets/add_task_button.dart';
 
@@ -88,20 +89,62 @@ class HomePage extends StatelessWidget {
                       controller: controller),
                 ),
               ),
-              children: buildItems(col),
+              children: buildItems(col, context),
               contentsWhenEmpty: Container()),
         )
         .toList();
   }
 
-  Widget buildHeader(BuildContext context, ColumnModel e) {
+  Widget buildHeader(BuildContext context, ColumnModel col) {
     return Card(
       child: ListTile(
         tileColor: Theme.of(context).primaryColor,
         title: GestureDetector(
-          onDoubleTap: () => Get.defaultDialog(),
+          onDoubleTap: () {
+            columnNameTxtCtrl.text = col.columnName;
+            Get.defaultDialog(
+                title: 'Edit',
+                content: TextField(
+                  controller: columnNameTxtCtrl,
+                ),
+                actions: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      controller.updateColumn(
+                          col.columnName, columnNameTxtCtrl.text);
+                      Get.back();
+                    },
+                    icon: const Icon(Icons.update),
+                    label: const Text('Update'),
+                  ),
+                  IconButton(
+                    // style: ButtonStyle(),
+                    onPressed: () async {
+                      await Get.defaultDialog(
+                        title: 'Delete Task',
+                        middleText:
+                            'Are you sure to delete column "${col.columnName}"? This can\'t be undone',
+                        confirm: ElevatedButton.icon(
+                          onPressed: () {
+                            controller.deleteColumn(col.columnName);
+                            Get.back();
+                          },
+                          icon: const Icon(Icons.delete_forever),
+                          label: const Text('DELETE'),
+                          style:
+                              TextButton.styleFrom(backgroundColor: Colors.red),
+                        ),
+                      );
+                      // controller.deleteColumn(col.columnName);
+                      Get.back();
+                    },
+                    icon: const Icon(Icons.delete),
+                    color: Colors.red,
+                  ),
+                ]);
+          },
           child: Text(
-            e.columnName,
+            col.columnName,
             style: const TextStyle(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
             textAlign: TextAlign.left,
@@ -111,42 +154,23 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  List<DragAndDropItem> buildItems(ColumnModel column) {
+  List<DragAndDropItem> buildItems(ColumnModel column, BuildContext context) {
     return column.tasks.map((task) {
       final taskName = task.taskName;
+      final taskDesc = task.description;
       return DragAndDropItem(
           child: GestureDetector(
         onDoubleTap: () {
           taskNameCtrl.text = taskName;
-          Get.defaultDialog(
-            title: 'Edit $taskName',
-            content: TextField(
-              decoration: const InputDecoration(
-                  border: UnderlineInputBorder(), labelText: 'Task Name'),
-              // hintText: taskName),
-              controller: taskNameCtrl,
-            ),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  controller.updateTask(
-                      column.columnName, taskName, taskNameCtrl.text);
-                  Get.back();
-                },
-                child: const Text('Save'),
-              ),
-              TextButton(
-                onPressed: () {
-                  controller.deleteTask(column.columnName, taskName);
-                  Get.back();
-                },
-                child: const Text(
-                  'Delete',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            ],
-          );
+          taskDescCtrl.text = taskDesc ?? '';
+          showModalBottomSheet(
+              isScrollControlled: true,
+              context: context,
+              builder: (context) => EditTaskSheet(
+                  taskNameCtrl: taskNameCtrl,
+                  controller: controller,
+                  col: column,
+                  taskDescCtrl: taskDescCtrl));
         },
         child: Card(child: ListTile(title: Text(task.taskName))),
       ));

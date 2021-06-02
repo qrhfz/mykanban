@@ -51,7 +51,8 @@ class AddTaskButton extends StatelessWidget {
                     padding: const EdgeInsets.all(12.0),
                     child: ElevatedButton.icon(
                         onPressed: () {
-                          controller.addTask(col.columnName, taskNameCtrl.text);
+                          controller.addTask(col.columnName, taskNameCtrl.text,
+                              taskDescCtrl.text);
                           Get.back();
                         },
                         icon: const Icon(Icons.add),
