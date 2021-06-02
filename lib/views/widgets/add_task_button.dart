@@ -21,11 +21,17 @@ class AddTaskButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () => showModalBottomSheet(
+          isScrollControlled: true,
           context: context,
           builder: (context) {
             return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.only(
+                  top: 16,
+                  left: 16,
+                  right: 16,
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: taskNameCtrl,
@@ -41,13 +47,16 @@ class AddTaskButton extends StatelessWidget {
                       labelText: 'Description',
                     ),
                   ),
-                  ElevatedButton.icon(
-                      onPressed: () {
-                        controller.addTask(col.columnName, taskNameCtrl.text);
-                        Get.back();
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text('add'))
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: ElevatedButton.icon(
+                        onPressed: () {
+                          controller.addTask(col.columnName, taskNameCtrl.text);
+                          Get.back();
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text('add')),
+                  )
                 ],
               ),
             );
